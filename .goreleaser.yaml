@@ -1,29 +1,22 @@
 before:
   hooks:
-    - go mod tidy
+    - cargo build --release
 
 builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-      - amd64
-      - arm64
-    main: ./
-    binary: gridist
+  - id: gridist
     builder: rust
-    mod_timestamp: '{{ .CommitTimestamp }}'
+    binary: gridist
+    targets:
+      - x86_64-apple-darwin
+      - aarch64-apple-darwin
+      - x86_64-pc-windows-msvc
+      - x86_64-unknown-linux-gnu
+      - aarch64-unknown-linux-gnu
+    dir: .
     flags:
-      - -trimpath
-    ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }}
-
-universal_binaries:
-  - replace: true
-    name_template: gridist
+      - --release
+    env:
+      - CGO_ENABLED=0
 
 archives:
   - format: tar.gz
@@ -34,9 +27,14 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
+    files:
+      - target/release/gridist
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
+
+universal_binaries:
+  - replace: true
 
 nfpms:
   - file_name_template: "{{ .ConventionalFileName }}"
