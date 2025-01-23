@@ -1,0 +1,38 @@
+name: Gridist Image Splitter
+
+on:
+  workflow_call:
+    inputs:
+      image_path:
+        description: 'Path to the image file to split'
+        required: true
+        type: string
+    secrets:
+      GIST_TOKEN:
+        description: 'GitHub token for uploading to Gists'
+        required: true
+
+jobs:
+  split-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build Gridist
+        run: cargo build --release
+
+      - name: Split and upload image
+        run: |
+          ./target/release/gridist upload "${{ inputs.image_path }}" -t "${{ secrets.GIST_TOKEN }}"

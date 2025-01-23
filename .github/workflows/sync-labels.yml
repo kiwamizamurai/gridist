@@ -1,0 +1,38 @@
+name: Sync Labels
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Sync labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Delete all existing labels
+          gh label list --json name -q '.[].name' | xargs -I {} gh label delete {} --yes || true
+          
+          # Create labels
+          gh label create "breaking-change" --color "b60205" --description "Breaking changes that require major version bump"
+          gh label create "breaking" --color "b60205" --description "Breaking changes that require major version bump"
+          gh label create "enhancement" --color "0e8a16" --description "New features and improvements"
+          gh label create "feature" --color "0e8a16" --description "New features and improvements"
+          gh label create "bug" --color "d73a4a" --description "Something isn't working"
+          gh label create "bugfix" --color "d73a4a" --description "Fix for a bug"
+          gh label create "fix" --color "d73a4a" --description "Fix for a bug"
+          gh label create "documentation" --color "0075ca" --description "Documentation improvements"
+          gh label create "docs" --color "0075ca" --description "Documentation improvements"
+          gh label create "chore" --color "bfdadc" --description "Maintenance and upkeep improvements"
+          gh label create "maintenance" --color "bfdadc" --description "Maintenance and upkeep improvements"
+          gh label create "dependencies" --color "fef2c0" --description "Updates to dependencies"
+          gh label create "deps" --color "fef2c0" --description "Updates to dependencies"

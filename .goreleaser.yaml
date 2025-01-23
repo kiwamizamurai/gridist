@@ -1,0 +1,91 @@
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    main: ./
+    binary: gridist
+    builder: rust
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }}
+
+universal_binaries:
+  - replace: true
+    name_template: gridist
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+    - goos: windows
+      format: zip
+
+nfpms:
+  - file_name_template: "{{ .ConventionalFileName }}"
+    maintainer: kiwamizamurai
+    description: A powerful cli tool that transforms your images into eye-catching grid layouts for your GitHub profile
+    license: MIT
+    formats:
+      - deb
+      - rpm
+      - apk
+
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    artifacts: checksum
+    args:
+      - sign-blob
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+
+sboms:
+  - artifacts: archive
+
+brews:
+  - repository:
+      owner: kiwamizamurai
+      name: homebrew-tap
+      token: "{{ .Env.GH_PAT }}"
+    directory: Formula
+    homepage: https://github.com/kiwamizamurai/gridist
+    description: A powerful cli tool that transforms your images into eye-catching grid layouts for your GitHub profile
+    license: MIT
+    test: |
+      system "#{bin}/gridist --version"
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
