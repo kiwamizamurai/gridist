@@ -33,6 +33,11 @@ jobs:
       - name: Install OpenSSL development headers
         run: sudo apt-get install -y pkg-config libssl-dev
 
+      - name: Set OpenSSL environment variables
+        run: |
+          echo "OPENSSL_DIR=/usr/include/openssl" >> $GITHUB_ENV
+          echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
+
       - uses: mlugg/setup-zig@v1
       - uses: sigstore/cosign-installer@v3.7.0
       - uses: anchore/sbom-action/download-syft@v0.18.0
