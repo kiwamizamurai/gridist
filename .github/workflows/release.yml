@@ -30,6 +30,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install OpenSSL development headers
+        run: sudo apt-get install -y pkg-config libssl-dev
+
       - uses: mlugg/setup-zig@v1
       - uses: sigstore/cosign-installer@v3.7.0
       - uses: anchore/sbom-action/download-syft@v0.18.0
