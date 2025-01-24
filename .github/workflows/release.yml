@@ -35,7 +35,8 @@ jobs:
 
       - name: Set OpenSSL environment variables
         run: |
-          echo "OPENSSL_DIR=/usr/include/openssl" >> $GITHUB_ENV
+          echo "OPENSSL_DIR=usr/lib/ssl" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
           echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
 
       - uses: mlugg/setup-zig@v1
