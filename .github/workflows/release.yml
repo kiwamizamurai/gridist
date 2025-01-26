@@ -30,12 +30,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install OpenSSL development headers
-        run: sudo apt-get install -y pkg-config libssl-dev
-
-      - name: Set OpenSSL environment variables
+      - name: Install Dependencies
         run: |
-          echo "OPENSSL_DIR=usr/lib/ssl" >> $GITHUB_ENV
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Set up OpenSSL Environment
+        run: |
+          echo "OPENSSL_DIR=/usr" >> $GITHUB_ENV
           echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
           echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
 
