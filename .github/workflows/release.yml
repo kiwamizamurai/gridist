@@ -33,14 +33,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y openssl libssl3 libssl-dev lld
-          sudo apt-get install -y pkg-config libssl-dev
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-
-      - name: Set up OpenSSL Environment
-        run: |
-          echo "OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu" >> $GITHUB_ENV
-          echo "OPENSSL_INCLUDE_DIR=/usr/include/openssl" >> $GITHUB_ENV
+          sudo apt-get install -y openssl libssl3 libssl-dev lld pkg-config
 
       - uses: mlugg/setup-zig@v1
       - uses: sigstore/cosign-installer@v3.7.0
@@ -50,9 +43,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
-          # either 'goreleaser' (default) or 'goreleaser-pro'
           distribution: goreleaser
-          # 'latest', 'nightly', or a semver
           version: "~> v2"
           args: release --clean
         env:
